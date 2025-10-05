@@ -4,26 +4,36 @@ import { SortIcon } from "./Icons.jsx";
 const TableHeader = ({ columns, onSort, sortConfig }) => (
   <thead className="bg-gray-700/50 sticky top-0 z-10">
     <tr>
-      {columns.map(({ key, label, className }) => (
-        <th
-          key={key}
-          onClick={() => onSort(key)}
-          className={`px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer select-none ${className}`}
-        >
-          <div className="flex items-center gap-2">
-            {label}
-            <SortIcon
-              isSorted={sortConfig.key === key}
-              direction={sortConfig.direction}
-            />
-          </div>
-        </th>
-      ))}
+      {columns.map(({ key, label, className = "" }) => {
+        const alignment = className.includes("text-right")
+          ? "text-right"
+          : "text-left";
+        const justifyClass =
+          alignment === "text-right" ? "justify-end" : "justify-start";
+
+        return (
+          <th
+            key={key}
+            onClick={() => onSort(key)}
+            className={`pl-3 pr-4 py-3 text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer select-none ${alignment} ${className}`}
+          >
+            <div className={`flex items-center gap-2 ${justifyClass}`}>
+              {label}
+              <SortIcon
+                isSorted={sortConfig.key === key}
+                direction={sortConfig.direction}
+              />
+            </div>
+          </th>
+        );
+      })}
     </tr>
   </thead>
 );
 
 const formatPrice = (price) => {
+  if (price === null || price === undefined || Number.isNaN(price)) return "-";
+
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -33,6 +43,8 @@ const formatPrice = (price) => {
 };
 
 const formatMarketCap = (cap) => {
+  if (cap === null || cap === undefined || Number.isNaN(cap)) return "-";
+
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -58,23 +70,25 @@ const TableRow = ({ coin }) => {
             alt={coin.name}
           />
           <div>
-            <div>{coin.name}</div>
-            <div className="text-gray-400 uppercase">{coin.symbol}</div>
+            <div className="whitespace-nowrap">{coin.name}</div>
+            <div className="text-gray-400 uppercase text-xs">{coin.symbol}</div>
           </div>
         </div>
       </td>
-      <td className="px-4 py-4 whitespace-nowrap text-sm text-right">
+      <td className="px-4 py-4 whitespace-nowrap text-sm text-right text-gray-100 tabular-nums">
         {formatPrice(coin.current_price)}
       </td>
       <td
-        className={`px-4 py-4 whitespace-nowrap text-sm font-medium text-right ${priceChangeColor}`}
+        className={`px-4 py-4 whitespace-nowrap text-sm font-medium text-right ${priceChangeColor} tabular-nums`}
       >
-        {coin.price_change_percentage_24h.toFixed(2)}%
+        {typeof coin.price_change_percentage_24h === "number"
+          ? `${coin.price_change_percentage_24h.toFixed(2)}%`
+          : "-"}
       </td>
-      <td className="px-4 py-4 whitespace-nowrap text-sm text-right hidden sm:table-cell">
+      <td className="px-4 py-4 whitespace-nowrap text-sm text-right text-gray-400 hidden sm:table-cell tabular-nums">
         {formatMarketCap(coin.market_cap)}
       </td>
-      <td className="px-4 py-4 whitespace-nowrap text-sm text-right hidden lg:table-cell">
+      <td className="px-4 py-4 whitespace-nowrap text-sm text-right text-gray-400 hidden lg:table-cell tabular-nums">
         {formatMarketCap(coin.total_volume)}
       </td>
     </tr>
@@ -134,7 +148,15 @@ const CryptoTable = ({ coins, onSort, sortConfig, loading }) => {
 
   return (
     <div className="overflow-x-auto max-h-[75vh]">
-      <table className="min-w-full divide-y divide-gray-700">
+      <table className="min-w-full divide-y divide-gray-700 table-fixed">
+        <colgroup>
+          <col className="w-12" />
+          <col className="w-1/3" />
+          <col className="w-28" />
+          <col className="w-24" />
+          <col className="w-36" />
+          <col className="w-36 lg:w-40" />
+        </colgroup>
         <TableHeader
           columns={columns}
           onSort={onSort}
