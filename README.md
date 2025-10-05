@@ -44,4 +44,16 @@ Includes search and sorting functionality.
 4. **Open your browser**
 
    http://localhost:3000
+   
+## 🙌 Credits
+
+- [CoinGecko API](https://www.coingecko.com/en/api)  
+- [Tailwind CSS](https://tailwindcss.com/)  
+- [React](https://react.dev/)  
+- [Vite](https://vitejs.dev/)  
+
+## 🧑‍💻 Developed By
+
+ **Varanasi Harish**
+
 
